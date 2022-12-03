@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-(db9*6#1r@&*(f=urknqj^jqm^kr^hxnz-9lln&2b-jxvjsrrr
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    '71e2-2405-201-a409-c1dc-414-207a-af81-fb4e.ngrok.io',
+    'b9f8-2405-201-a409-c1dc-58a7-d5f1-c829-b297.ngrok.io',
     'localhost',
     '127.0.0.1:8000'
 ]
@@ -70,6 +70,12 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'chatiobackend.urls'
+
+
+PASSWORD_HASHERS = [
+    'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
+    
+]
 
 TEMPLATES = [
     {
@@ -195,3 +201,4 @@ CORS_ALLOWED_ORIGINS = [
     "https://f122-2405-201-a409-c1dc-9d9a-5a79-4923-8a7.ngrok.io",
     
 ]
+
