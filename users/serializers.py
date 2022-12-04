@@ -17,7 +17,7 @@ class UserSerializer(serializers.Serializer):
 
 
 class ProfileSerializer(serializers.Serializer):
-    dp = serializers.CharField()
+    dp = serializers.ImageField()
     user = UserSerializer()
 
     def create(self, validated_data):

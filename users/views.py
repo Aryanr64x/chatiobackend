@@ -19,7 +19,11 @@ from .serializers import UserSerializer, ProfileSerializer
 from rest_framework.response import Response
 from django.views.decorators.csrf import csrf_exempt
 from .models import Profile
+from .models import Test
+import base64
+from django.core.files.base import ContentFile
 
+from PIL import Image
 
 @permission_classes([IsAuthenticated])
 @api_view(['GET'])
@@ -27,6 +31,8 @@ def index(request):
     profiles = Profile.objects.all()
     serializer = ProfileSerializer(profiles, many = True)
     return HttpResponse(JSONRenderer().render(serializer.data))
+
+
 
 
 @csrf_exempt
@@ -37,7 +43,7 @@ def createUser(request):
 
     if(userSerializer.is_valid()):
         userSerializer.save()
-        profile = Profile(dp="", user_id=userSerializer.data["id"])
+        profile = Profile(dp=None, user_id=userSerializer.data["id"])
         profile.save()
         return HttpResponse(JSONRenderer().render(userSerializer.data))
     else:
@@ -45,7 +51,36 @@ def createUser(request):
         return HttpResponse("Cannot Create User!" )
 
 
-    
+
+
+@permission_classes([IsAuthenticated])
+@api_view(['POST'])
+def updateProfile(request):
+    stream = io.BytesIO(request.body)
+    data = JSONParser().parse(stream)
+    imageBASE64 = data['image']
+    request.user.profile.dp = ContentFile(base64.b64decode(imageBASE64), 'chatio'+str(request.user.id)+'.jpg');
+    request.user.profile.save()
+    return HttpResponse(JSONRenderer().render(ProfileSerializer(request.user.profile).data))
+
+
+
+
+
+
+@csrf_exempt
+def test(request):
+    print("THE REQUEST BODY HAS BEEN PRINTED BELOW")
+    stream = io.BytesIO(request.body)
+    data = JSONParser().parse(stream)
+    imageBASE64 = data['image']
+    # Now what to do 
+    test = Test(photo = ContentFile(base64.b64decode(imageBASE64), 'abc.jpg'))
+    test.save()
+    return HttpResponse("Success")
+
+
+
 
 
 
@@ -56,7 +91,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 
     
         token['username'] = user.username
-        token['dp'] = user.profile.dp
+        token['dp'] = ProfileSerializer(user.profile).data["dp"]
         
 
         return token
