@@ -9,8 +9,8 @@ from rest_framework.parsers import JSONParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import permission_classes, api_view
 import io
-from users.serializers import UserSerializer
-
+from users.serializers import UserSerializer, ProfileSerializer
+from users.models import Profile
 
 @csrf_exempt
 @permission_classes([IsAuthenticated])
@@ -18,14 +18,26 @@ from users.serializers import UserSerializer
 def create(request):
     # Can be shopped to serializer?
     stream = io.BytesIO(request.body)
+    
     data = JSONParser().parse(stream)
-    user1 = User.objects.get(id=data['user_id'])
+
+    profile1 = Profile.objects.get(user__id=data['user_id'])
+
+    profile2 = Profile.objects.get(user__id = request.user.id)
+
+
     chatroom = ChatRoom(total_members = 2)
+    
     chatroom.save();
-    chatroom.members.add(user1)
-    chatroom.members.add(request.user)
+    
+    chatroom.members.add(profile1)
+    
+    chatroom.members.add(profile2)
+    
     chatroom.save()  
+    
     serializer = ChatRoomSerializer(chatroom)
+    
     return HttpResponse(JSONRenderer().render(serializer.data))
     
     
@@ -36,8 +48,11 @@ def create(request):
 @permission_classes([IsAuthenticated])
 @api_view(['GET'])
 def index(request):
-    chatrooms = request.user.chatroom_set.all();
+    
+    chatrooms = request.user.profile.chatroom_set.all();
+
     chatroomsSerialized = ChatRoomSerializer(chatrooms, many = True)
+
     return HttpResponse(JSONRenderer().render(chatroomsSerialized.data))
 
 
@@ -50,17 +65,14 @@ def index(request):
 def messageCreate(request):
     stream = io.BytesIO(request.body)
     data = JSONParser().parse(stream)
+
+    message = Message(text=data["text"], profile_id=request.user.profile.id, chatroom_id=data["chatroom"]["id"])
+    message.save()
+
     
-    message = MessageSerializer(data = {
-        "text": data['text'],
-        "chatroom": data["chatroom"],
-        "user": UserSerializer(request.user).data
-    })
-    if message.is_valid(raise_exception = True):
-       message.save()
-       return HttpResponse(JSONRenderer().render(message.data))
-    else: 
-       return HttpResponse(message.errors)
+       
+    return HttpResponse(JSONRenderer().render(MessageSerializer(message).data))
+    
 
 
 

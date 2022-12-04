@@ -10,12 +10,11 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 from datetime import timedelta
-
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+import os
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
@@ -27,7 +26,7 @@ SECRET_KEY = 'django-insecure-(db9*6#1r@&*(f=urknqj^jqm^kr^hxnz-9lln&2b-jxvjsrrr
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    'b9f8-2405-201-a409-c1dc-58a7-d5f1-c829-b297.ngrok.io',
+    '101a-2405-201-a409-c1dc-418e-3840-92e2-dcdc.ngrok.io',
     'localhost',
     '127.0.0.1:8000'
 ]
@@ -45,6 +44,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'users',
     'chat',
     'chattest',
     'rest_framework',
@@ -94,6 +94,12 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'chatiobackend.wsgi.application'
+
+# Base url to serve media files
+MEDIA_URL = '/media/'
+
+# Path where media is stored
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
 
 # Database

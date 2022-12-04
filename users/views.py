@@ -15,18 +15,18 @@ import io
 from rest_framework import status
 from rest_framework.parsers import JSONParser
 from django.contrib.auth.models import User
-from .serializers import UserSerializer
+from .serializers import UserSerializer, ProfileSerializer
 from rest_framework.response import Response
 from django.views.decorators.csrf import csrf_exempt
+from .models import Profile
 
 
 @permission_classes([IsAuthenticated])
 @api_view(['GET'])
 def index(request):
-    
-    users = User.objects.all()
-    users_data = UserSerializer(users, many = True)
-    return HttpResponse(JSONRenderer().render(users_data.data))
+    profiles = Profile.objects.all()
+    serializer = ProfileSerializer(profiles, many = True)
+    return HttpResponse(JSONRenderer().render(serializer.data))
 
 
 @csrf_exempt
@@ -34,14 +34,18 @@ def createUser(request):
     stream = io.BytesIO(request.body)
     data = JSONParser().parse(stream)
     userSerializer = UserSerializer(data = {"username": data['username'], "password": data["password"]})
+
     if(userSerializer.is_valid()):
         userSerializer.save()
+        profile = Profile(dp="", user_id=userSerializer.data["id"])
+        profile.save()
         return HttpResponse(JSONRenderer().render(userSerializer.data))
     else:
+        # TODO : RETURN RESPONSE WITH ERROR
         return HttpResponse("Cannot Create User!" )
 
-    
 
+    
 
 
 
@@ -52,6 +56,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 
     
         token['username'] = user.username
+        token['dp'] = user.profile.dp
         
 
         return token
