@@ -1,5 +1,5 @@
 from .views import MyTokenObtainPairView
-from .views import index, createUser, test, updateProfile
+from .views import index, createUser, updateProfile
 from django.urls import path
 
 
@@ -9,7 +9,6 @@ urlpatterns = [
     path('/token/refresh/', MyTokenObtainPairView.as_view(), name='token_refresh'),
     path('/',index),
     path('/users/create/', createUser),
-    path('/test/', test),
     path('/user/update/', updateProfile)
     # path('/users/profile/create/', )
 

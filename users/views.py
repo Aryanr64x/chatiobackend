@@ -68,16 +68,7 @@ def updateProfile(request):
 
 
 
-@csrf_exempt
-def test(request):
-    print("THE REQUEST BODY HAS BEEN PRINTED BELOW")
-    stream = io.BytesIO(request.body)
-    data = JSONParser().parse(stream)
-    imageBASE64 = data['image']
-    # Now what to do 
-    test = Test(photo = ContentFile(base64.b64decode(imageBASE64), 'abc.jpg'))
-    test.save()
-    return HttpResponse("Success")
+
 
 
 
@@ -89,7 +80,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     def get_token(cls, user):
         token = super().get_token(user)
 
-    
+        
         token['username'] = user.username
         token['dp'] = ProfileSerializer(user.profile).data["dp"]
         
